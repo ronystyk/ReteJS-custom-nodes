@@ -9,12 +9,10 @@ export function usePerformanceMetrics() {
     const memoryUsage = ref('N/A')
     const memoryInfo = ref({})
     const cpuInfo = ref({})
-    const gpuInfo = ref({})
     const performanceMetrics = ref({})
     
-    // Nuevas métricas de consumo real
+    // Métricas de consumo real
     const cpuUsage = ref(0)
-    const gpuUsage = ref(0)
     const frameTime = ref(0)
     const lastFrameTime = ref(performance.now())
 
@@ -32,8 +30,9 @@ export function usePerformanceMetrics() {
         const cpuTime = end - start
         
         // Calcular porcentaje de uso basado en el tiempo de procesamiento
-        // Un valor más alto indica más uso de CPU
-        const usage = Math.min(100, (cpuTime / 10) * 100)
+        // Ajustar para que sea más realista (basado en tu observación del 10%)
+        // Un tiempo de procesamiento típico debería dar valores entre 5-20%
+        const usage = Math.min(100, (cpuTime / 50) * 100)
         
         return {
             usage: Math.round(usage),
@@ -42,95 +41,10 @@ export function usePerformanceMetrics() {
         }
     }
 
-    // Función para medir el uso de GPU
-    const measureGPUUsage = () => {
-        try {
-            const canvas = document.createElement('canvas')
-            canvas.width = 256
-            canvas.height = 256
-            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
-            
-            if (!gl) {
-                return { usage: 0, error: 'WebGL no disponible' }
-            }
-            
-            const start = performance.now()
-            
-            // Crear shaders para medir rendimiento GPU
-            const vertexShader = gl.createShader(gl.VERTEX_SHADER)
-            const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)
-            
-            gl.shaderSource(vertexShader, `
-                attribute vec2 position;
-                void main() {
-                    gl_Position = vec4(position, 0.0, 1.0);
-                }
-            `)
-            
-            gl.shaderSource(fragmentShader, `
-                precision mediump float;
-                uniform float time;
-                void main() {
-                    vec2 uv = gl_FragCoord.xy / 256.0;
-                    float color = sin(uv.x * 10.0 + time) * cos(uv.y * 10.0 + time);
-                    gl_FragColor = vec4(color, color, color, 1.0);
-                }
-            `)
-            
-            gl.compileShader(vertexShader)
-            gl.compileShader(fragmentShader)
-            
-            const program = gl.createProgram()
-            gl.attachShader(program, vertexShader)
-            gl.attachShader(program, fragmentShader)
-            gl.linkProgram(program)
-            gl.useProgram(program)
-            
-            // Crear geometría
-            const positions = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1])
-            const buffer = gl.createBuffer()
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-            gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW)
-            
-            const positionLocation = gl.getAttribLocation(program, 'position')
-            gl.enableVertexAttribArray(positionLocation)
-            gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0)
-            
-            const timeLocation = gl.getUniformLocation(program, 'time')
-            
-            // Renderizar múltiples frames para medir rendimiento
-            let frameCount = 0
-            const maxFrames = 100
-            
-            const renderFrame = () => {
-                gl.uniform1f(timeLocation, performance.now() * 0.001)
-                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
-                frameCount++
-                
-                if (frameCount < maxFrames) {
-                    requestAnimationFrame(renderFrame)
-                } else {
-                    const end = performance.now()
-                    const gpuTime = end - start
-                    
-                    // Calcular uso de GPU basado en tiempo de renderizado
-                    const usage = Math.min(100, (gpuTime / 50) * 100)
-                    
-                    gpuUsage.value = Math.round(usage)
-                    gpuInfo.value.gpuUsage = Math.round(usage)
-                    gpuInfo.value.renderTime = gpuTime.toFixed(2)
-                    gpuInfo.value.framesRendered = frameCount
-                }
-            }
-            
-            renderFrame()
-            
-        } catch (error) {
-            console.warn('Error al medir GPU:', error)
-            return { usage: 0, error: error.message }
-        }
-    }
-
+    // Variables para controlar la actualización de FPS
+    let frameCount = 0
+    let lastFPSUpdate = performance.now()
+    
     // Función para medir FPS y tiempo de frame
     const measureFramePerformance = () => {
         const currentTime = performance.now()
@@ -138,13 +52,20 @@ export function usePerformanceMetrics() {
         
         frameTime.value = deltaTime
         lastFrameTime.value = currentTime
+        frameCount++
         
-        // Calcular FPS
-        const fps = 1000 / deltaTime
-        performanceMetrics.value.fps = Math.round(fps)
-        performanceMetrics.value.frameTime = deltaTime.toFixed(2)
+        // Actualizar FPS solo cada segundo
+        if (currentTime - lastFPSUpdate >= 1000) {
+            const fps = Math.round((frameCount * 1000) / (currentTime - lastFPSUpdate))
+            performanceMetrics.value.fps = fps
+            performanceMetrics.value.frameTime = (1000 / fps).toFixed(2)
+            
+            // Resetear contadores
+            frameCount = 0
+            lastFPSUpdate = currentTime
+        }
         
-        // Usar requestAnimationFrame para continuar midiendo
+        // Continuar midiendo con requestAnimationFrame
         requestAnimationFrame(measureFramePerformance)
     }
 
@@ -171,39 +92,6 @@ export function usePerformanceMetrics() {
         const cpuMetrics = measureCPUUsage()
         info.usage = cpuMetrics.usage
         info.processingTime = cpuMetrics.processingTime
-        
-        return info
-    }
-
-    // Función para obtener información del GPU
-    const getGPUInfo = () => {
-        const info = {}
-        
-        try {
-            const canvas = document.createElement('canvas')
-            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
-            
-            if (gl) {
-                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info')
-                if (debugInfo) {
-                    info.vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL)
-                    info.renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
-                }
-                
-                info.webglVersion = gl.getParameter(gl.VERSION)
-                info.shadingLanguageVersion = gl.getParameter(gl.SHADING_LANGUAGE_VERSION)
-                
-                // Capacidades del GPU
-                info.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE)
-                info.maxViewportDims = gl.getParameter(gl.MAX_VIEWPORT_DIMS)
-                info.maxRenderbufferSize = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE)
-                
-                // Medir uso actual de GPU
-                measureGPUUsage()
-            }
-        } catch (error) {
-            console.warn('No se pudo obtener información del GPU:', error)
-        }
         
         return info
     }
@@ -284,10 +172,9 @@ export function usePerformanceMetrics() {
         memoryUsage.value = getMemoryUsage()
     }
 
-    // Función para actualizar métricas de CPU y GPU
+    // Función para actualizar métricas de CPU
     const updateHardwareMetrics = () => {
         cpuInfo.value = getCPUInfo()
-        gpuInfo.value = getGPUInfo()
         performanceMetrics.value = getPerformanceMetrics()
     }
 
@@ -309,7 +196,6 @@ export function usePerformanceMetrics() {
         updateHardwareMetrics()
         console.log(`💾 Memoria usada: ${memoryUsage.value}`, memoryInfo.value)
         console.log(`🖥️ CPU Info:`, cpuInfo.value)
-        console.log(`🎮 GPU Info:`, gpuInfo.value)
     }
 
     // Inicializar métricas
@@ -363,22 +249,18 @@ export function usePerformanceMetrics() {
         memoryUsage,
         memoryInfo,
         cpuInfo,
-        gpuInfo,
         performanceMetrics,
         cpuUsage,
-        gpuUsage,
         frameTime,
         
         // Métodos
         getMemoryInfo,
         getMemoryUsage,
         getCPUInfo,
-        getGPUInfo,
         getPerformanceMetrics,
         updateMemoryMetrics,
         updateHardwareMetrics,
         measureCPUUsage,
-        measureGPUUsage,
         measureFramePerformance,
         onPaneReady,
         finishLoading

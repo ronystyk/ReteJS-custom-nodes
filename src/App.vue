@@ -2,9 +2,17 @@
     <div style="width: 100vw; height: 100vh">
         <LoadingOverlay :loading="loading" :initTime="initTime" />
 
-        <MetricsPanel :initTime="initTime" :paneReadyTime="paneReadyTime" :totalAppTime="totalAppTime"
-            :memoryUsage="memoryUsage" :memoryInfo="memoryInfo" :cpuInfo="cpuInfo" :gpuInfo="gpuInfo"
-            :performanceMetrics="performanceMetrics" :cpuUsage="cpuUsage" :gpuUsage="gpuUsage" :frameTime="frameTime" />
+        <MetricsPanel 
+            :initTime="initTime"
+            :paneReadyTime="paneReadyTime"
+            :totalAppTime="totalAppTime"
+            :memoryUsage="memoryUsage"
+            :memoryInfo="memoryInfo"
+            :cpuInfo="cpuInfo"
+            :performanceMetrics="performanceMetrics"
+            :cpuUsage="cpuUsage"
+            :frameTime="frameTime"
+        />
 
         <RETEEditor :onPaneReady="onPaneReady" />
     </div>
@@ -29,10 +37,8 @@ const {
     memoryUsage,
     memoryInfo,
     cpuInfo,
-    gpuInfo,
     performanceMetrics,
     cpuUsage,
-    gpuUsage,
     frameTime,
     onPaneReady
 } = usePerformanceMetrics()

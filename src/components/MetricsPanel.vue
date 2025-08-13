@@ -61,38 +61,7 @@
             </div>
         </div>
 
-        <!-- Métricas de GPU -->
-        <div class="section">
-            <h4>🎮 GPU</h4>
-            <div v-if="gpuInfo.gpuUsage !== undefined" class="metric">
-                <span>Uso actual:</span>
-                <span class="value" :class="getUsageClass(gpuInfo.gpuUsage)">{{ gpuInfo.gpuUsage }}%</span>
-            </div>
-            <div v-if="gpuInfo.renderTime" class="metric">
-                <span>Tiempo render:</span>
-                <span class="value">{{ gpuInfo.renderTime }}ms</span>
-            </div>
-            <div v-if="gpuInfo.framesRendered" class="metric">
-                <span>Frames render:</span>
-                <span class="value">{{ gpuInfo.framesRendered }}</span>
-            </div>
-            <div v-if="gpuInfo.renderer" class="metric">
-                <span>Renderizador:</span>
-                <span class="value">{{ gpuInfo.renderer }}</span>
-            </div>
-            <div v-if="gpuInfo.vendor" class="metric">
-                <span>Fabricante:</span>
-                <span class="value">{{ gpuInfo.vendor }}</span>
-            </div>
-            <div v-if="gpuInfo.webglVersion" class="metric">
-                <span>WebGL:</span>
-                <span class="value">{{ gpuInfo.webglVersion }}</span>
-            </div>
-            <div v-if="gpuInfo.maxTextureSize" class="metric">
-                <span>Max Textura:</span>
-                <span class="value">{{ gpuInfo.maxTextureSize }}</span>
-            </div>
-        </div>
+
 
         <!-- Métricas de rendimiento -->
         <div class="section">
@@ -145,10 +114,7 @@ const props = defineProps({
         type: Object,
         default: () => ({})
     },
-    gpuInfo: {
-        type: Object,
-        default: () => ({})
-    },
+
     performanceMetrics: {
         type: Object,
         default: () => ({})
@@ -157,10 +123,7 @@ const props = defineProps({
         type: Number,
         default: 0
     },
-    gpuUsage: {
-        type: Number,
-        default: 0
-    },
+
     frameTime: {
         type: Number,
         default: 0
