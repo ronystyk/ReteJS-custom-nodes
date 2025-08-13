@@ -24,8 +24,8 @@ svg {
 svg path {
   fill: none;
   stroke-width: 3px;
-  stroke-dasharray: 5;              /* Tamaño de los guiones */
-  stroke-dashoffset: 0;
+  /* stroke-dasharray: 5; 
+  stroke-dashoffset: 0; */
   pointer-events: auto;
   stroke: #999;
   /* animation: dashmove 1s linear infinite; */
