@@ -15,7 +15,7 @@ export class ElementsBuilder {
     this.nodeFactory = new NodeFactory(editor);
   }
 
-  async buildElements(cols = 10, rowsByElement = 10) {
+  async buildElements(cols = 20, rowsByElement = 20) {
     const inicio = await this.nodeFactory.createNode("Inicio");
     const salida = await this.nodeFactory.createNode("Salida");
 
