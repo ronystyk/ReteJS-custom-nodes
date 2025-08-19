@@ -1,6 +1,6 @@
 <template>
     <div class="input-group">
-        <label>Nombre:</label>
+        <label>{{ data.label }}</label>
         <a-input type="text" :value="data.value" />
     </div>
 </template>

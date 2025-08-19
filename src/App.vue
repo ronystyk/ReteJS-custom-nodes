@@ -14,7 +14,7 @@
             :frameTime="frameTime"
         />
 
-        <RETEEditor :onPaneReady="onPaneReady" />
+        <ReteFlow :onPaneReady="onPaneReady" />
     </div>
 </template>
 
@@ -23,7 +23,7 @@ import { ref, onMounted } from 'vue'
 import LoadingOverlay from './components/LoadingOverlay.vue'
 import MetricsPanel from './components/MetricsPanel.vue'
 import { usePerformanceMetrics } from './composables/usePerformanceMetrics'
-import RETEEditor from './components/RETEEditor.vue'
+import ReteFlow from './components/ReteFlow.vue'
 // import { createEditor } from './rete/editor'
 
 // const rete = ref(null)
