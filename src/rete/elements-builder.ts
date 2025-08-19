@@ -1,9 +1,16 @@
-import { ClassicPreset } from "rete";
-import { NodeEditor } from "rete";
+// Importar características de rete
+import { ClassicPreset, NodeEditor } from "rete";
+
+// Importar plugin de área
 import { AreaPlugin } from "rete-area-plugin";
+
+// Importar tipos
 import { Schemes, AreaExtra } from "./types";
+
+// Importar factory de nodos
 import { NodeFactory } from "./node-factory";
 
+// Constructor de elementos de prueba
 export class ElementsBuilder {
   private nodeFactory: NodeFactory;
   private editor: NodeEditor<Schemes>;
@@ -15,6 +22,7 @@ export class ElementsBuilder {
     this.nodeFactory = new NodeFactory(editor);
   }
 
+  // Construir elementos de prueba
   async buildElements(cols = 20, rowsByElement = 20) {
     const inicio = await this.nodeFactory.createNode("Inicio");
     const salida = await this.nodeFactory.createNode("Salida");

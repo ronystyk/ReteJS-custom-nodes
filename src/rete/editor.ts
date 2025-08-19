@@ -1,6 +1,13 @@
+// Importar plugin de área para manipular el área de trabajo
 import { AreaExtensions } from "rete-area-plugin";
+
+// Importar configuración de plugins
 import { createPlugins } from "./plugins-config";
+
+// Importar builder de elementos de prueba
 import { ElementsBuilder } from "./elements-builder";
+
+// Importar fondo personalizado
 import { addCustomBackground } from "./custom-background";
 
 export async function createEditor(container: HTMLElement) {

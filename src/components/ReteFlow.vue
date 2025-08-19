@@ -4,7 +4,7 @@
 </template>
 
 <script setup>
-// Importar Vue
+// Importar características de Vue
 import { onMounted, ref } from 'vue'
 
 // Importar la función de creación del editor

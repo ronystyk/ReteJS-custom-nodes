@@ -1,18 +1,14 @@
 <template>
     <div class="input-group">
         <label>{{ data.label }}</label>
-        <a-input type="text" :value="data.value" />
+        <input type="text" :value="data.value" />
     </div>
 </template>
 
 <script>
-import { Input } from "ant-design-vue";
 
 export default {
   props: ['data'],
-  components: {
-    AInput: Input
-  }
 }
 </script>
 
